@@ -32,7 +32,7 @@ from sklearn import metrics
 
 
 def main(valid_paths_csv, preds_csv, valid_labels_csv):
-    print('Reporting AUC scores...')
+    print("Reporting AUC scores...")
 
     preds_df = pd.read_csv(preds_csv, header=None)
     valid_df = pd.read_csv(valid_labels_csv)
@@ -40,7 +40,7 @@ def main(valid_paths_csv, preds_csv, valid_labels_csv):
     old_case = None
 
     cases = []
-    with open(valid_paths_csv, 'r') as paths:
+    with open(valid_paths_csv, "r") as paths:
         for path in paths:
             case = os.path.splitext(os.path.basename(path.strip()))[0]
             if case == old_case:
@@ -55,7 +55,7 @@ def main(valid_paths_csv, preds_csv, valid_labels_csv):
     for i, case in enumerate(cases):
         case_row = valid_df[valid_df.case == int(case)]
 
-        y = case_row.values[0,1:].astype(np.float32)
+        y = case_row.values[0, 1:].astype(np.float32)
         ys.append(y)
 
         X = preds_df.iloc[i].values
@@ -68,22 +68,24 @@ def main(valid_paths_csv, preds_csv, valid_labels_csv):
 
     diagnoses = valid_df.columns.values[1:]
 
-    for i,diagnosis in enumerate(diagnoses):
+    for i, diagnosis in enumerate(diagnoses):
         auc = metrics.roc_auc_score(ys[i], Xs[i])
 
         aucs[diagnosis] = auc
 
-    aucs['avegare'] = np.array(list(aucs.values())).mean()
+    aucs["avegare"] = np.array(list(aucs.values())).mean()
 
     for k, v in aucs.items():
-        print(f'  {k}: {v:.3f}')
+        print(f"  {k}: {v:.3f}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     arguments = docopt(__doc__)
 
-    print('Parsing arguments...')
+    print("Parsing arguments...")
 
-    main(arguments['<valid_paths_csv>'],
-         arguments['<preds_csv>'],
-         arguments['<valid_labels_csv>'])
+    main(
+        arguments["<valid_paths_csv>"],
+        arguments["<preds_csv>"],
+        arguments["<valid_labels_csv>"],
+    )

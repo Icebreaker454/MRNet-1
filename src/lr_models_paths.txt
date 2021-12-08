@@ -1,0 +1,3 @@
+/home/icebreaker/Projects/PhD/Sandbox/MRNet/models/lr_abnormal.pkl
+/home/icebreaker/Projects/PhD/Sandbox/MRNet/models/lr_acl.pkl
+/home/icebreaker/Projects/PhD/Sandbox/MRNet/models/lr_meniscus.pkl
