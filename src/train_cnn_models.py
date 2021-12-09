@@ -209,6 +209,9 @@ def main(data_dir, plane, epochs, lr, weight_decay, backbone: str = None, device
 
                 min_valid_losses[i] = batch_v_loss
 
+    save_models_to_gs(out_dir, epochs, plane, backbone)
+
+
 
 if __name__ == "__main__":
     arguments = docopt(__doc__)

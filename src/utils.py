@@ -2,6 +2,9 @@ import os
 import csv
 from pathlib import Path
 
+import glob
+
+from google.cloud import storage
 import subprocess
 import numpy as np
 import torch
@@ -23,28 +26,17 @@ def load_mrnet_dataset(data_dir):
     subprocess.call(args)
 
 
-def save_model_to_gs(model_dir):
+def save_model_to_gs(out_dir: str, epochs: int, plane: str, backbone: str):
+    experiment_dir = f"{backbone}_cnn_{epochs}e"
 
-    scheme = 'gs://'
-    job_dir = args.job_dir.split("/")
-    bucket_name = job_dir[2]
-    object_prefix = "/".join(job_dir[3:]).rstrip("/")
-
-    if object_prefix:
-        model_path = '{}/{}'.format(object_prefix, args.model_name)
-    else:
-        model_path = '{}'.format(args.model_name)
+    local_files = glob.glob(f"{out_dir}/{backbone}_cnn_{plane}*.pt")
 
     bucket = storage.Client().bucket("mrnet-training-bucket")
-    local_path = os.path.join("/tmp", args.model_name)
-    files = [
-        f for f in os.listdir(local_path) if os.path.isfile(os.path.join(local_path, f))
-    ]
-    for file in files:
-        local_file = os.path.join(local_path, file)
-        blob = bucket.blob("/".join([model_path, file]))
-        blob.upload_from_filename(local_file)
-    print(f"Saved model files in gs://{bucket_name}/{model_path}")
+
+    for file in local_files:
+        filename = file.rsplit("/", 1)[1]
+        blob = bucket.blob(f"{experiment_dir}/{plane}/{filename}")
+        blob.upload_from_filename(file)
 
 
 def preprocess_data(case_path, transform=None):
