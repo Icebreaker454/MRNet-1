@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torchvision import models
 
-from backbones import BackboneType
+from src.backbones import BackboneType
 
 
 class MRNet(nn.Module):

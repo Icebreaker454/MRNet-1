@@ -34,9 +34,9 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
-from data_loader import make_data_loader
-from model import MRNet, BACKBONE_MAPPING
-from utils import (
+from src.data_loader import make_data_loader
+from src.model import MRNet, BACKBONE_MAPPING
+from src.utils import (
     create_output_dir,
     print_stats,
     save_losses,
