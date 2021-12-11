@@ -26,14 +26,15 @@ Training options:
 import sys
 import numpy as np
 import pandas as pd
-from docopt import docopt
 from datetime import datetime
 
+import click
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
+from src.backbones import BackboneType
 from src.data_loader import make_data_loader
 from src.model import MRNet, BACKBONE_MAPPING
 from src.utils import (
@@ -111,7 +112,37 @@ def update_lr_schedulers(lr_schedulers, batch_valid_losses):
         scheduler.step(v_loss)
 
 
-def main(data_dir, plane, epochs, lr, weight_decay, backbone: str = None, device=None):
+@click.command()
+@click.argument(
+    "data_dir",
+    type=str,
+)
+@click.argument("plane", type=click.Choice(["axial", "coronal", "sagittal"]))
+@click.option("--epochs", type=int, default=10, help="Number of epochs to train")
+@click.option("--lr", type=float, default=1e-5, help="Learning rate")
+@click.option("--weight-decay", type=float, default=0.01, help="Weight decay")
+@click.option("--backbone", type=BackboneType, help="Backbone net used for training")
+@click.option(
+    "--device",
+    type=click.Choice(["cuda", "cpu"]),
+    default="cuda",
+    help="Training device",
+)
+@click.option("--load-dataset/--no-load-dataset", default=False)
+def main(
+    data_dir: str,
+    plane: str,
+    epochs: int,
+    lr: float,
+    weight_decay: float,
+    backbone: BackboneType = None,
+    device: str = None,
+    load_dataset: bool = False,
+):
+
+    if load_dataset:
+        load_mrnet_dataset(data_dir)
+
     diagnoses = ["abnormal", "acl", "meniscus"]
 
     exp = f"{backbone}-{epochs}e-{datetime.now():%Y-%m-%d_%H-%M}"
@@ -124,7 +155,9 @@ def main(data_dir, plane, epochs, lr, weight_decay, backbone: str = None, device
 
     print("Creating data loaders...")
 
-    train_loader = make_data_loader(data_dir, "train", plane, device, shuffle=True, backbone=backbone)
+    train_loader = make_data_loader(
+        data_dir, "train", plane, device, shuffle=True, backbone=backbone
+    )
     valid_loader = make_data_loader(data_dir, "valid", plane, device, backbone=backbone)
 
     print(f"Creating models...")
@@ -212,21 +245,5 @@ def main(data_dir, plane, epochs, lr, weight_decay, backbone: str = None, device
     save_models_to_gs(out_dir, epochs, plane, backbone)
 
 
-
 if __name__ == "__main__":
-    arguments = docopt(__doc__)
-
-    print("Parsing arguments...")
-
-    if not arguments["--no-load-dataset"]:
-        load_mrnet_dataset(arguments["<data_dir>"])
-
-    main(
-        arguments["<data_dir>"],
-        arguments["<plane>"],
-        int(arguments["<epochs>"]),
-        float(arguments["--lr"]),
-        float(arguments["--weight-decay"]),
-        arguments["--backbone"],
-        arguments["--device"],
-    )
+    main()
