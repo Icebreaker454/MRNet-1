@@ -65,7 +65,8 @@ def make_dataset(
             transforms.RandomAffine(25, translate=(0.1, 0.1)),
             transforms.ToTensor(),
         ]
-        if backbone is not None and (additional := ADDITIONAL_TRANSFORMS.get(backbone)):
+        if backbone is not None and ADDITIONAL_TRANSFORMS.get(backbone):
+            additional = ADDITIONAL_TRANSFORMS[backbone]
             steps = [
                 *additional.get("pre", []),
                 *steps,
