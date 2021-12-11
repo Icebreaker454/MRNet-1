@@ -38,6 +38,7 @@ from src.backbones import BackboneType
 from src.data_loader import make_data_loader
 from src.model import MRNet, BACKBONE_MAPPING
 from src.utils import (
+    seed_all,
     create_output_dir,
     print_stats,
     save_losses,
@@ -122,6 +123,7 @@ def update_lr_schedulers(lr_schedulers, batch_valid_losses):
 @click.option("--lr", type=float, default=1e-5, help="Learning rate")
 @click.option("--weight-decay", type=float, default=0.01, help="Weight decay")
 @click.option("--backbone", type=BackboneType, help="Backbone net used for training")
+@click.option("--seed", type=int, default=42, help="Seed used for training reproducibility")
 @click.option(
     "--device",
     type=click.Choice(["cuda", "cpu"]),
@@ -136,9 +138,12 @@ def main(
     lr: float,
     weight_decay: float,
     backbone: BackboneType = None,
+        seed: int = 42,
     device: str = None,
     load_dataset: bool = False,
 ):
+
+    seed_all(seed)
 
     if load_dataset:
         load_mrnet_dataset(data_dir)

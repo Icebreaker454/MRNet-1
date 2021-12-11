@@ -1,5 +1,6 @@
 import os
 import csv
+import random
 from pathlib import Path
 
 import glob
@@ -12,6 +13,17 @@ from sklearn import metrics
 MAX_PIXEL_VAL = 255
 MEAN = 58.09
 STD = 49.73
+
+
+def seed_all(seed: int):
+    """ Seed for each and every possible source of randomness """
+
+    random.seed(seed)
+    os.environ('PYTHONHASHSEED') = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.backends.cudnn.deterministic = True
 
 
 def load_mrnet_dataset(data_dir):
