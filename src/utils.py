@@ -40,20 +40,27 @@ def load_mrnet_dataset(data_dir):
     blobs = [blob for blob in bucket.list_blobs(prefix=prefix)]
     paths = {}
 
-    with client.batch():
-        for blob in blobs:
-            path, filename = blob.name.rsplit("/", 1)
-            if path.startswith(prefix):
-                path = path[len(prefix):]
+    try:
+        with client.batch():
+            for blob in blobs:
+                path, filename = blob.name.rsplit("/", 1)
+                if path.startswith(prefix):
+                    path = path[len(prefix):]
 
-            path = path.lstrip("/")
+                path = path.lstrip("/")
 
-            local_path = Path(data_dir, path)
-            if local_path not in paths:
-                local_path.mkdir(parents=True, exist_ok=True)
+                local_path = Path(data_dir, path)
+                if local_path not in paths:
+                    local_path.mkdir(parents=True, exist_ok=True)
 
-            print(f"Downloading blob {blob} to path {local_path / filename}")
-            blob.download_to_filename(local_path / filename)
+                print(f"Downloading blob {blob} to path {local_path / filename}")
+                blob.download_to_filename(local_path / filename)
+    except ValueError as e:
+        print(f"Value error while downlaoding MRNet dataset - {e}")
+        # TODO: Attempting to skip batch errors
+        if "no deferred requests" in str(e).lower():
+            pass
+        raise e
 
 
 def save_model_to_gs(out_dir: str, epochs: int, plane: str, backbone: str):

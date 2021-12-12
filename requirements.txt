@@ -1,3 +1,4 @@
+click
 docopt
 joblib
 numpy
