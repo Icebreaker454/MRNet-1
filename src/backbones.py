@@ -13,14 +13,19 @@ class BackboneType(str, Enum):
     ALEXNET = "alexnet"
     VGG_11 = "vgg11"
     VGG_16 = "vgg16"
-    INCEPTION = "inception"
+    RESNET = "resnet"
+    INCEPTION_RESNET = "inception-resnet"
+    INCEPTION_V4 = "inception-v4"
+    XCEPTION = "xception"
+    EFFICIENTNET = "efficientnet"
+    FBNET = "fbnet"
 
 
 ADDITIONAL_TRANSFORMS = {
-    BackboneType.INCEPTION: {
-        "pre": [
-            transforms.Resize(299),
-            transforms.CenterCrop(299),
-        ]
+    BackboneType.INCEPTION_RESNET: {
+        # "pre": [
+        #     transforms.Resize(299),
+        #     transforms.CenterCrop(299),
+        # ]
     }
 }

@@ -3,7 +3,7 @@
 tears, by combine predictions from CNN models.
 
 Usage:
-  train_lr_models.py <data_dir> <models_dir>
+  train_lr_models.py <data_dir> <models_dir> [options]
   train_lr_models.py (-h | --help)
 
 General options:
@@ -115,7 +115,7 @@ def main(data_dir: str, models_dir: str, backbone: BackboneType = None):
 
     for i, clf in enumerate(clfs):
         print(f"Cross validation score for {conditions[i]}: {clf.score(X, y):.3f}")
-        clf_path = f"{models_dir}/{backbone}/lr_{conditions[i]}.pkl"
+        clf_path = f"{models_dir}/lr_{backbone}_{conditions[i]}.pkl"
         joblib.dump(clf, clf_path)
 
     print(f"Logistic regression models saved to {models_dir}")
@@ -125,6 +125,7 @@ if __name__ == "__main__":
     arguments = docopt(__doc__)
 
     print("Parsing arguments...")
+
 
     main(
         arguments["<data_dir>"],

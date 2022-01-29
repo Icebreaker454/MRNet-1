@@ -4,7 +4,7 @@ in src/cnn_models_paths.txt and logistic regression models specified in
 src/lr_models_paths.txt.
 
 Usage:
-  predict.py <valid_paths_csv> <output_dir>
+  predict.py <valid_paths_csv> <cnn_models_paths> <lr_models_paths> <output_dir> [options]
   predict.py (-h | --help)
 
 General options:
@@ -15,11 +15,18 @@ Arguments:
                      be in a specific order - an example is provided as
                      valid-paths.csv in the root of the project
                      e.g. 'valid-paths.csv'
+  <cnn_models_paths> .txt file listing the cnn models which should be loaded
+                     for predictions
+  <lr_models_paths>  .txt file listing LR models
+
   <output_dir>       Directory where predictions are saved as a 3-column csv
                      file (with no header), where each column contains a
                      prediction for abnormality, ACL tear, and meniscal tear,
                      in that order
-                     e.g. 'out_dir'
+                     e.g. 'out_dir
+Training options:
+  --backbone=<backbone> Backbone used. "alexnet", "vgg16" or "inception"
+
 """
 
 import os
@@ -38,12 +45,16 @@ from src.model import MRNet, BACKBONE_MAPPING
 from src.utils import preprocess_data
 
 
-def main(valid_paths_csv: str, output_dir: str, backbone: BackboneType = None):
+def main(
+    valid_paths_csv: str,
+    cnn_models_paths: str,
+    lr_models_paths: str,
+    output_dir: str,
+    backbone: BackboneType = None,
+):
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     input_files_df = pd.read_csv(valid_paths_csv, header=None)
-    cnn_models_paths = "src/cnn_models_paths.txt"
-    lr_models_paths = "src/lr_models_paths.txt"
 
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -130,4 +141,10 @@ if __name__ == "__main__":
 
     print("Parsing arguments...")
 
-    main(arguments["<valid_paths_csv>"], arguments["<output_dir>"])
+    main(
+        arguments["<valid_paths_csv>"],
+        arguments["<cnn_models_paths>"],
+        arguments["<lr_models_paths>"],
+        arguments["<output_dir>"],
+        arguments["--backbone"],
+    )

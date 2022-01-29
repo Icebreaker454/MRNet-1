@@ -23,7 +23,6 @@ Training options:
                         it will be set to the value returned by torch.cuda.is_available()
 """
 
-import sys
 import numpy as np
 import pandas as pd
 from datetime import datetime
@@ -44,6 +43,7 @@ from src.utils import (
     save_losses,
     save_checkpoint,
     load_mrnet_dataset,
+    save_model_to_gs,
 )
 
 
@@ -247,7 +247,7 @@ def main(
 
                 min_valid_losses[i] = batch_v_loss
 
-    save_models_to_gs(out_dir, epochs, plane, backbone)
+    save_model_to_gs(out_dir, epochs, plane, backbone)
 
 
 if __name__ == "__main__":
