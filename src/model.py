@@ -62,13 +62,27 @@ class MRNetOnVGG11(MRNet):
         return models.vgg11(pretrained=True).features
 
 
+class MRNetOnRegnet(MRNet):
+
+    LINEAR_CLASSIFIER_IN = 400
+
+    def _get_backbone(self):
+        model = models.regnet_x_400mf(pretrained=True)
+
+        children = [_ for _ in model.children()]
+        new_model = torch.nn.Sequential(*children[:-2])
+        for param in new_model.parameters():
+            param.requires_grad = False
+        return new_model
+
+
+
 class InceptionMRNetMixin(MRNet):
     KERNEL_SIZE = 5
     TIMM_MODEL_NAME = None
 
     def _get_backbone(self):
         model = timm.create_model(self.TIMM_MODEL_NAME, pretrained=True, num_classes=0, global_pool="")
-        model.eval()
         return model
 
 
@@ -85,7 +99,6 @@ class MRNetOnInceptionV4(InceptionMRNetMixin):
 
     def _get_backbone(self):
         model = timm.create_model('inception_v4', pretrained=True, num_classes=0, global_pool="")
-        model.eval()
         return model
 
 
@@ -94,15 +107,13 @@ class MRNetOnInceptionResnet(InceptionMRNetMixin):
 
     def _get_backbone(self):
         model = timm.create_model('inception_resnet_v2', pretrained=True, num_classes=0, global_pool="")
-        model.eval()
         return model
 
 class MRNetOnEfficientNet(InceptionMRNetMixin):
     LINEAR_CLASSIFIER_IN = 1280
 
     def _get_backbone(self):
-        model = timm.create_model('efficientnet_b0', pretrained=True, num_classes=0, global_pool="")
-        model.eval()
+        model = timm.create_model('efficientnet_es', pretrained=True, num_classes=0, global_pool="")
         return model
 
 
@@ -111,8 +122,16 @@ class MRNetOnFBNet(InceptionMRNetMixin):
 
     def _get_backbone(self):
         model = timm.create_model('fbnetc_100', pretrained=True, num_classes=0, global_pool="")
-        model.eval()
         return model
+
+
+class MRNetOnTinyNet(InceptionMRNetMixin):
+    LINEAR_CLASSIFIER_IN = 1984
+
+    def _get_backbone(self):
+        model = timm.create_model('tinynet_a', pretrained=True, num_classes=0, global_pool="")
+        return model
+
 
 
 
@@ -125,5 +144,7 @@ BACKBONE_MAPPING = {
     BackboneType.INCEPTION_RESNET: MRNetOnInceptionResnet,
     BackboneType.EFFICIENTNET: MRNetOnEfficientNet,
     BackboneType.FBNET: MRNetOnFBNet,
+    BackboneType.TINYNET: MRNetOnTinyNet,
+    BackboneType.REGNET: MRNetOnRegnet,
     # BackboneType.XCEPTION: MRNetOnXception,
 }

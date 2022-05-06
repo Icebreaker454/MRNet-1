@@ -3,7 +3,7 @@
 Meniscal tear tasks.
 
 Usage:
-  evaluate.py <valid_paths_csv> <preds_csv> <valid_labels_csv>
+  evaluate.py <valid_paths_csv> <preds_csv> <valid_labels_csv> [options]
   evaluate.py (-h | --help)
 
 General options:
@@ -18,6 +18,10 @@ Arguments:
                        e.g. 'out_dir/predictions.csv'
   <valid_labels_csv>   csv file containing labels for the valid dataset
                        e.g. 'MRNet-v1.0/valid_labels.csv'
+
+Training options:
+  --backbone=<backbone> Backbone used. "alexnet", "vgg16" or "inception"
+
 """
 
 import os
@@ -28,10 +32,14 @@ from docopt import docopt
 import pandas as pd
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 from sklearn import metrics
 
+from backbones import BackboneType
 
-def main(valid_paths_csv, preds_csv, valid_labels_csv):
+
+def main(valid_paths_csv, preds_csv, valid_labels_csv, backbone: BackboneType = None):
     print("Reporting AUC scores...")
 
     preds_df = pd.read_csv(preds_csv, header=None)
@@ -65,18 +73,38 @@ def main(valid_paths_csv, preds_csv, valid_labels_csv):
     Xs = np.asarray(Xs).transpose()
 
     aucs = {}
+    kappas = {}
 
     diagnoses = valid_df.columns.values[1:]
 
     for i, diagnosis in enumerate(diagnoses):
         auc = metrics.roc_auc_score(ys[i], Xs[i])
 
+        kappa_X = Xs[i].copy()
+
+        name = f"{backbone}-{diagnosis}"
+        metrics.RocCurveDisplay.from_predictions(
+            ys[i], Xs[i], name=name,
+        )
+        plt.savefig(f"./auc_images/{name}.png")
+
+        # kappa = metrics.cohen_kappa_score(ys[i], Xs[i])
+
         aucs[diagnosis] = auc
+        # kappas[diagnosis] = kappa
 
     aucs["avegare"] = np.array(list(aucs.values())).mean()
 
+    # kappas["avegare"] = np.array(list(kappas.values())).mean()
+
     for k, v in aucs.items():
         print(f"  {k}: {v:.3f}")
+
+    # print("Cohen's kappa values")
+    # for k, v in kappas.items():
+    #     print(f"  {k}: {v:.3f}")
+
+
 
 
 if __name__ == "__main__":
@@ -88,4 +116,5 @@ if __name__ == "__main__":
         arguments["<valid_paths_csv>"],
         arguments["<preds_csv>"],
         arguments["<valid_labels_csv>"],
+        arguments["--backbone"],
     )

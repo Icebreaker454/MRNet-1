@@ -19,6 +19,8 @@ class BackboneType(str, Enum):
     XCEPTION = "xception"
     EFFICIENTNET = "efficientnet"
     FBNET = "fbnet"
+    TINYNET = "tinynet"
+    REGNET = "regnet"
 
 
 ADDITIONAL_TRANSFORMS = {

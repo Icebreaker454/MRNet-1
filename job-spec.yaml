@@ -6,8 +6,8 @@ workerPoolSpecs:
     imageUri: gcr.io/warm-aegis-336012/mrnet-container
     args:
       - MRNet-v1.0
-      - axial
-      - --epochs=8
-      - --backbone=resnet
+      - sagittal
+      - --epochs=10
+      - --backbone=efficientnet
       - --no-load-dataset
       - --device=cpu
