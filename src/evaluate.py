@@ -21,6 +21,7 @@ Arguments:
 
 Training options:
   --backbone=<backbone> Backbone used. "alexnet", "vgg16" or "inception"
+  --plot-auc=<plot_auc> Plot AUC or not
 
 """
 
@@ -28,6 +29,7 @@ import os
 import sys
 import csv
 from docopt import docopt
+from pprint import pprint
 
 import pandas as pd
 import numpy as np
@@ -39,8 +41,8 @@ from sklearn import metrics
 from backbones import BackboneType
 
 
-def main(valid_paths_csv, preds_csv, valid_labels_csv, backbone: BackboneType = None):
-    print("Reporting AUC scores...")
+def main(valid_paths_csv, preds_csv, valid_labels_csv, backbone: BackboneType = None, plot_auc: bool = False):
+    print(f"Reporting {preds_csv} scores...")
 
     preds_df = pd.read_csv(preds_csv, header=None)
     valid_df = pd.read_csv(valid_labels_csv)
@@ -73,48 +75,76 @@ def main(valid_paths_csv, preds_csv, valid_labels_csv, backbone: BackboneType = 
     Xs = np.asarray(Xs).transpose()
 
     aucs = {}
-    kappas = {}
 
+    THRESHOLDS = {
+        "50%": 0.5,
+        # "80%": 0.8,
+        # "95%": 0.95,
+    }
+        
+
+    accuracy = {}
+
+    f1 = {}    
+    
     diagnoses = valid_df.columns.values[1:]
 
     for i, diagnosis in enumerate(diagnoses):
         auc = metrics.roc_auc_score(ys[i], Xs[i])
 
-        kappa_X = Xs[i].copy()
+        for name, value in THRESHOLDS.items():
+            X_threshold = np.vectorize(lambda x: 1 if x >= value else 0)(Xs[i])
+            acc = metrics.accuracy_score(ys[i], X_threshold)
 
-        name = f"{backbone}-{diagnosis}"
-        metrics.RocCurveDisplay.from_predictions(
-            ys[i], Xs[i], name=name,
-        )
-        plt.savefig(f"./auc_images/{name}.png")
+            f1_score = metrics.f1_score(ys[i], X_threshold)            
 
-        # kappa = metrics.cohen_kappa_score(ys[i], Xs[i])
+            acc_dict = accuracy.setdefault(name, {})
+            acc_dict[diagnosis] = acc
+
+            f1_dict = f1.setdefault(name, {})
+            f1_dict[diagnosis] = f1_score
+
+        if plot_auc:
+            name = f"{backbone}-{diagnosis}"
+            metrics.RocCurveDisplay.from_predictions(
+                ys[i], Xs[i], name=name,
+            )
+            plt.savefig(f"./auc_images/{name}.png")
 
         aucs[diagnosis] = auc
-        # kappas[diagnosis] = kappa
 
     aucs["avegare"] = np.array(list(aucs.values())).mean()
 
-    # kappas["avegare"] = np.array(list(kappas.values())).mean()
-
+    print("AUCs:")
     for k, v in aucs.items():
         print(f"  {k}: {v:.3f}")
 
-    # print("Cohen's kappa values")
-    # for k, v in kappas.items():
-    #     print(f"  {k}: {v:.3f}")
+    print("========================================")        
 
+    for name, value in THRESHOLDS.items():
+        print(f"Accuracy threshold={value}")
 
+        for diag, v in accuracy[name].items():
+            print(f"  {diag}: {v:.3f}")
+        
+        print(f"Average: {np.array(list(accuracy[name].values())).mean()}")
 
+        print("========================================")
+        print(f"F1 Score: threshold={value}")
+        for diag, v in f1[name].items():
+            print(f"  {diag}: {v:.3f}")
+                
+        print(f"Average: {np.array(list(f1[name].values())).mean()}")
+        
+        
 
 if __name__ == "__main__":
     arguments = docopt(__doc__)
-
-    print("Parsing arguments...")
 
     main(
         arguments["<valid_paths_csv>"],
         arguments["<preds_csv>"],
         arguments["<valid_labels_csv>"],
         arguments["--backbone"],
+        arguments["--plot-auc"],        
     )
