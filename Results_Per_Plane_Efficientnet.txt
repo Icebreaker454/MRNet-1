@@ -1,0 +1,56 @@
+Reporting ./predictions_efficientnet_axial.csv scores...
+AUCs:
+  abnormal: 0.845
+  acl: 0.586
+  meniscus: 0.642
+  avegare: 0.691
+========================================
+Accuracy threshold=0.5
+  abnormal: 0.833
+  acl: 0.558
+  meniscus: 0.600
+Average: 0.6638888888888889
+========================================
+F1 Score: threshold=0.5
+  abnormal: 0.896
+  acl: 0.523
+  meniscus: 0.586
+Average: 0.6681875841358601
+
+Reporting ./predictions_efficientnet_coronal.csv scores...
+AUCs:
+  abnormal: 0.667
+  acl: 0.593
+  meniscus: 0.535
+  avegare: 0.598
+========================================
+Accuracy threshold=0.5
+  abnormal: 0.675
+  acl: 0.575
+  meniscus: 0.558
+Average: 0.6027777777777777
+========================================
+F1 Score: threshold=0.5
+  abnormal: 0.777
+  acl: 0.557
+  meniscus: 0.514
+Average: 0.6158086880544
+
+Reporting ./predictions_efficientnet_sagittal.csv scores...
+AUCs:
+  abnormal: 0.723
+  acl: 0.631
+  meniscus: 0.591
+  avegare: 0.648
+========================================
+Accuracy threshold=0.5
+  abnormal: 0.758
+  acl: 0.583
+  meniscus: 0.533
+Average: 0.625
+========================================
+F1 Score: threshold=0.5
+  abnormal: 0.848
+  acl: 0.615
+  meniscus: 0.569
+Average: 0.6775943079608

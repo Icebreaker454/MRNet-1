@@ -1,0 +1,56 @@
+Reporting ./predictions_resnet_axial.csv scores...
+AUCs:
+  abnormal: 0.848
+  acl: 0.763
+  meniscus: 0.618
+  avegare: 0.743
+========================================
+Accuracy threshold=0.5
+  abnormal: 0.792
+  acl: 0.700
+  meniscus: 0.567
+Average: 0.6861111111111112
+========================================
+F1 Score: threshold=0.5
+  abnormal: 0.869
+  acl: 0.660
+  meniscus: 0.527
+Average: 0.6855866778024242
+
+Reporting ./predictions_resnet_coronal.csv scores...
+AUCs:
+  abnormal: 0.477
+  acl: 0.462
+  meniscus: 0.659
+  avegare: 0.532
+========================================
+Accuracy threshold=0.5
+  abnormal: 0.508
+  acl: 0.492
+  meniscus: 0.650
+Average: 0.5499999999999999
+========================================
+F1 Score: threshold=0.5
+  abnormal: 0.629
+  acl: 0.512
+  meniscus: 0.553
+Average: 0.564707435657255
+
+Reporting ./predictions_resnet_sagittal.csv scores...
+AUCs:
+  abnormal: 0.912
+  acl: 0.700
+  meniscus: 0.632
+  avegare: 0.748
+========================================
+Accuracy threshold=0.5
+  abnormal: 0.883
+  acl: 0.633
+  meniscus: 0.583
+Average: 0.7000000000000001
+========================================
+F1 Score: threshold=0.5
+  abnormal: 0.927
+  acl: 0.627
+  meniscus: 0.554
+Average: 0.7025911353241862
